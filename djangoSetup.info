@@ -1,0 +1,32 @@
+1. How to Install DJANGO web framework on Centos 7:
+    1a. Install EPEL Repository --> contains extra packages as part of the core distribution.
+        1a1. sudo yum install epel-release
+
+2. Install django through pip in a Virtualenv --> The Python "virtualenv" package allows you to create self-contained environments for various projects.  Using this, you can install Django in a project directory without affecting the greater system.  This allows you to provide per-project customizations and packages easily.  
+    2a. Install Django through pip in a Virtualenv
+        2a1. Install pip from the EPEL repository
+            2a1a. sudo yum install python-pip
+    2b. Once pip installed, install virtualenv through pip
+        2b1. sudo pip install virtualenv
+
+3. Now, when you start a new project, you can create a new virtual environment
+for it.  Start by creating a directory for it and then cd in to it.
+    3a. mkdir ~/newproject, cd ~/newproject
+
+4. Create a virtual environment within the project directory
+    4a. virtualenv [environment_name]
+
+5. To install packages in to the newly created isolated environment, it
+    must first be activated:
+    5a. source [virtual_environment_name]/bin/activate --> from within the
+        directory where the virtual environment was created.
+
+6. In new environment, use pip to install Django.  Note: you do not need to use sudo since you are installing locally within virtual environment.
+    6a. pip install django (to install latest version, or you can specify
+        a specific version)
+    6b. Verify Django version and successful install:
+        6b1. django-admin --version
+    6c. To leave virtual environment:
+        6c1. deactivate
+
+

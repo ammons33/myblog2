@@ -1,0 +1,32 @@
+====================================================
+Start New Project
+====================================================
+(venv_mysite2) [jammons@localhost] (~/django/blog2) $ django-admin startproject mysite2 .
+    --> Note the "." at the end signifying to place it in current directory.
+
+====================================================
+MISC INFO
+====================================================
+* django-admin.py --> script will create directories and files for you.
+* manage.py --> script that helps with management of site.
+*settings.py --> contains the configuration of your website
+*urls.py --> contains a list of patterns used by 'urlresolver'
+
+====================================================
+SETTINGS
+====================================================
+(venv_mysite2) [jammons@localhost] (~/django/blog2/mysite2) $ vim settings.py 
+
+Change Time Zone to your local time zone:
+    TIME_ZONE = 'America/Chicago'
+
+Add path for static files
+    Go to end of file and just under "STATIC_URL" entry, add a new one called 
+    "STATIC_ROOT"
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+
+
+
+
+
