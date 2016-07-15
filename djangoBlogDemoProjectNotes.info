@@ -354,6 +354,179 @@ Create a Post using Query Set:
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 http://tutorial.djangogirls.org/en/dynamic_data_in_templates/
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+Code below will create a post_list view and a query set variable called
+"posts" that will need to then be passed to the appropriate template.
+One of the main purposes of a view is to get the data from model (DB)
+and then pass that along to a template.
 
+myblog2/views.py:
+def post_list(request):
+    posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
+    return render(request, 'myblog2/post_list.html', {})
+
+In the render function we already have parameter with request (so everything we receive from the user via the Internet) and a template file 'blog/post_list.html'. The last parameter, which looks like this: {} is a place in which we can add some things for the template to use. We need to give them names (we will stick to 'posts' right now :)). It should look like this: {'posts': posts}. Please note that the part before : is a string; you need to wrap it with quotes ''.
+
+So, finally code looks like this:
+
+from django.shortcuts import render
+from django.utils import timezone
+from .models import Post
+
+def post_list(request):
+    posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
+    return render(request, 'blog/post_list.html', {'posts': posts})
+
+*Now, we need to go to the template (myblog2/templates/myblog2/post_list.html)
+and add this query set (posts)*
+
+==============================================================
+Django Templates
+==============================================================
+Template Tags:
+    In HTML, you can't write python code b/c web browsers do not understand
+    it.  They only know HTML.  HTML static, Python is more dynamic.
+    Django template tags allow us to transfer Python-like things into HTML,
+    so you can build dynamic websites faster and easier.
+
+To print a variable in Django templates, we use double curly brackets
+with the variable's name inside --> {{ posts }}
+
+Add this to myblog2/templates/myblogs/post_list.html:
+
+<div>
+    <h1><a href="/">My Blog</a></h1>
+</div>
+
+{% for post in posts %}
+    <div>
+        <p>published: {{ post.published_date }}</p>
+        <h1><a href="">{{ post.title }}</a></h1>
+        <p>{{ post.text|linebreaksbr }}</p>
+    </div>
+{% endfor %}
+
+*the |linebreaksbr is piping the posts' text through a filter to convert line-breaks into paragraphs.*
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Now, post changes to github.
+
+git status
+git add --all
+git status
+git commit -m "COMMENT"
+git push (github external repo already added previously, will prompt
+            for credentials)
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Now, pull updates from github to Python Anywhere (or wherever site hosted)
+    Pull up the BASH shell and type in: git pull
+
+Next, go to the Web tab and click "Reload".
+
+===================================================================
+CSS - Make it look pretty --> Bootstrap
+===================================================================
+CSS = make-up for webpage (make it pretty)
+
+Bootstrap --> https://getbootstrap.com/
+
+To install Bootstrap, you need to add this to your <head> in your .html file (myblog2/templates/blog/post_list.html):
+
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    ^^^ --> This doesn't add any files to project, it just points
+            to files that exist on the internet.
+
+==================================================================
+Static Files
+==================================================================
+Static Files = CSS and images --> their content doesn't depend on 
+the request context and will be same for every user.
+
+Built-in apps like "admin" already have their static files built-in
+as well and Django knows where to find.
+
+For user-created apps, create a folder called "static" within your
+app folder (myblog2 in this example) --> myblog2/static/css/myblog2.css
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Edit the post_list.html file to load static files and with bootstrap:
+
+{% load staticfiles %}
+  2 <html>
+  3     <head>
+  4         <title>Ammons Family Blog</title>
+  5         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2    .0/css/bootstrap.min.css">
+  6         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2    .0/css/bootstrap-theme.min.css">
+  7         <link rel="stylesheet" href="{% static 'css/myblog2.css' %}">
+  8     </head>
+  9     <body>
+ 10         <div>
+ 11             <h1><a href="/">Ammons Family Blog</a></h1>
+ 12         </div>
+ 13 
+ 14         {% for post in posts %}
+ 15             <div>
+ 16                 <p>published: {{ post.published_date }}</p>
+ 17                 <h1><a href="">{{ post.title }}</a></h1>
+ 18                 <p>{{ post.text|linebreaksbr }}</p>
+ 19             </div>
+ 20         {% endfor %}
+ 21     </body>
+ 22 </html>
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Add classes to your CSS and then update the post_list.html file
+with div tags.
+
+==================================================================
+Template Extending
+==================================================================
+Create a base template --> For site consistency, can be extended
+on every page.
+
+base.html file can be created that can act as the "base" html, which
+other html files can extend.
+
+base.html code (for this example:
+
+<body>
+    <div class="page-header">
+        <h1><a href="/">Django Girls Blog</a></h1>
+    </div>
+    <div class="content container">
+        <div class="row">
+            <div class="col-md-8">
+            {% block content %}
+            {% endblock %}
+            </div>
+        </div>
+    </div>
+</body>
+
+*Everything between the {% block content %} {% endblock %} will be
+the new stuff that gets added with the individual app html files*
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Final code for the post_list.html file, which now extends the base.html:
+
+{% extends 'myblog2/base.html' %}
+
+{% block content %}
+    {% for post in posts %}
+        <div class="post">
+            <div class="date">
+                {{ post.published_date }}
+            </div>
+            <h1><a href="">{{ post.title }}</a></h1>
+            <p>{{ post.text|linebreaksbr }}</p>
+        </div>
+    {% endfor %}
+{% endblock %}
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Check my final code for updates
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Additional Tutorial:
+https://www.gitbook.com/book/djangogirls/django-girls-tutorial-extensions/details
 
