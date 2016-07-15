@@ -25,8 +25,335 @@ Add path for static files
     "STATIC_ROOT"
     STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+====================================================
+DATABASE SETUP
+====================================================
+SQLITE3 is default database but many other options.
+    *SQLITE3 is already setup for you by default in mysite2/settings.py
+
+Create Database for Blog:
+    (venv_mysite2) [jammons@localhost] (~/django/blog2) $ python manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, contenttypes, auth, sessions
+
+*By default, creates admin, contenttypes, auth, and sessions databases.*
+
+====================================================
+Run Web Server
+====================================================
+To test that web server is now working, run this command:
+    python manage.py runserver 
+    http://127.0.0.1:8000 or Http://localhost:8000
+
+====================================================
+DJANGO MODELS / OBJECTS
+====================================================
+Object --> collection of properties and actions.
+    Object: Cat
+        Properties: color, age, mood
+        Actions: purr, scratch, feed
+Properties = Object Properties
+Actions = Methods
+
+    Object: Blog
+        Properties: title, text, author, created_date, published_date
+        Methods: Publish
+
+DJANGO Model = special kind of object saved in database.
+    *You can think of a model in the database as a spreadsheet with
+     columns(fields) and rows(data).
+
+====================================================
+Creating an Application
+====================================================
+(venv_mysite2) [jammons@localhost] (~/django/blog2) $ python manage.py startapp myblog2
+
+*After you create an app, need to tell Django to use it!*
+    --> mysite2/settings.py
+        -->Add to INSTALLED_APPS name of app ('myblog2' in this case)
+
+====================================================
+Create a Blog Post Model/Object
+====================================================
+myblog2/models.py --> in this file we define all objects called Models.
+
+from django.db import models
+from django.utils import timezone
 
 
+class Post(models.Model):
+    author = models.ForeignKey('auth.User')
+    title = models.CharField(max_length=200)
+    text = models.TextField()
+    created_date = models.DateTimeField(
+            default=timezone.now)
+    published_date = models.DateTimeField(
+            blank=True, null=True)
+
+    def publish(self):
+        self.published_date = timezone.now()
+        self.save()
+
+    def __str__(self):
+        return self.title
+
+Explanation of code above:
+
+class Post(models.Model): - this line defines our model (it is an object).
+
+Post is name of model(object) --> always start a class name with an uppercase
+letter.
+
+class is a special keyword that indicates that we are defining an object.
+
+models.Model --> means that the Post is a Django Model, so Django knows that it should be saved in the database.
+
+models.CharField --> define text w/ limited number of characters
+
+models.TextField --> long text without a limit.  
+
+models.DateTimeField --> date and time field
+
+models.ForeignKey --> this is a link to another model
+
+def publish(self) --> def means that this is a function/method(action) and 
+publish is the name of it.  Methods should be lowercase.
+
+*Methods often return something, such as def __str__(self) --> when __str__()
+is called, you will get a text(string) with a Post title.*
+
+====================================================
+ADD MODEL to DATABASE
+====================================================
+First, let Django know that we have made updates to our database (b/c we
+just created a Post model/object).
+    python manage.py makemigrations myblog2
+
+(venv_mysite2) [jammons@localhost] (~/django/blog2) $ python manage.py makemigrations myblog2
+Migrations for 'myblog2':
+  0001_initial.py:
+    - Create model Post
+
+*Django just prepared a migration file that now needs to be applied to our 
+database by using this command:
+    python manage.py migrate myblog2
+
+(venv_mysite2) [jammons@localhost] (~/django/blog2) $ python manage.py migrate myblog2
+Operations to perform:
+  Apply all migrations: myblog2
+
+=====================================================
+DJANGO ADMIN
+=====================================================
+To Register our Post Model/Object with built-in admin site, edit the 
+myblog2/admin.py file:
+    from django.contrib import admin
+    from .models import Post
+
+    admin.site.register(Post)
+
+======================================================
+Create SuperUser
+======================================================
+python manage.py createsuperuser
+
+======================================================
+Install Git
+======================================================
+sudo yum install git (Fedora / CentOS / RedHat)
+sudo apt-get install git (Debian/Ubuntu)
+
+======================================================
+Initialize Git Repository
+======================================================
+1. git init
+2. git config --global user.name "Your Name"
+3. git config --global user.email you@example.com
+
+*Initialize git once per project.
+*Git will track changes to all the files and folders in 
+the directory.
+*If you want to ignore a file/folder, create a .gitignore
+file and add them to it (i.e., see below)
+
+*.pyc
+__pycache__
+myvenv
+db.sqlite3
+/static
+.DS_Store
+
+======================================================
+Git
+======================================================
+git status --> shows you what files have changed and 
+would be added if you did a "git add".
+
+git add --all --> adds the modified files
+
+git commit -m "Description for what files have changed"
+
+=======================================================
+GitHub
+=======================================================
+Create GitHub account and add repository
+
+Add GitHub repository to the local git repository
+$ git remote add origin https://github.com/<your-github-username>/[github_repo_name.git
+
+Push local git to GitHub
+$ git push -u origin master
+
+========================================================
+Python Anywhere (web hosting)
+========================================================
+Open BASH shell
+Clone your GitHub repository
+git clone https://github.com/ammons33/familyblog.git
+
+Create Virtual Environment on Python Anywhere BASH shell environment:
+16:04 ~/familyblog (master)$ virtualenv --python=python3.5 venv_mysite2/
+Running virtualenv with interpreter /usr/bin/python3.5
+Using base prefix '/usr'
+New python executable in /home/joshammons/familyblog/venv_mysite2/bin/python3.5
+Not overwriting existing python script /home/joshammons/familyblog/venv_mysite2/bin/python (you must use /home/joshammons/familyblog/venv_mysi
+te2/bin/python3.5)
+Installing setuptools, pip, wheel...done.
+
+
+
+Activate Virtual Environment:
+16:07 ~/familyblog (master)$ source venv_mysite2/bin/activate
+(venv_mysite2) 16:07 ~/familyblog (master)$ 
+
+Install DJANGO:
+(venv_mysite2) 16:09 ~/familyblog (master)$ pip install django~=1.9.0                                                                         
+Collecting django~=1.9.0                                                                                                                      
+Installing collected packages: django                                                                                                         
+Successfully installed django-1.9.7 
+
+
+Create Database on Python Anywhere:
+python manage.py migrate
+
+Create SuperUser (for admin page login)
+python manage.py createsuperuser
+
+Add New Web App on Web Page
+Manually configure it to use Python 3.5
+
+Enter the virtual environment path in the Virtualenv section:
+/home/jammons/familyblog/new_venv
+
+=====================================================
+WSGI File Configuration on Python Anywhere
+=====================================================
+
+Django works using the "WSGI protocol", a standard for serving websites
+using Python.
+
+Need to edit WSGI config file:
+Click on the "WSGI configuration file" link (in the "Code" section near the top of the page -- it'll be named something like /var/www/<your-PythonAnywhere-username>_pythonanywhere_com_wsgi.py), and you'll be taken to an editor.
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Delete Contents and put in something (like this):
+import os
+import sys
+
+path = '/home/<your-PythonAnywhere-username>/familyblog'  # use your own PythonAnywhere username here
+if path not in sys.path:
+    sys.path.append(path)
+
+os.environ['DJANGO_SETTINGS_MODULE'] = 'myblog2.settings'
+
+from django.core.wsgi import get_wsgi_application
+from django.contrib.staticfiles.handlers import StaticFilesHandler
+application = StaticFilesHandler(get_wsgi_application())
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+WSGI file purpose is to tell Python Anywhere (or server hosting web app)
+where the web app lives and what the Django setting file's name is.
+
+============================================================
+Django URLs
+============================================================
+Every page on internet needs its own URL
+
+In Django we use URLconf (URL configuration)
+    URLconf is a set of patterns that Django will try to match 
+    with the received URL to find the correct view.
+
+url(r'^admin/', admin.site.urls)
+    It means that for every URL that starts with admin/ Django will find a 
+    corresponding view.
+
+A little bit of Regex:
+
+^ for beginning of the text
+$ for end of text
+\d for a digit
++ to indicate that the previous item should be repeated at least once
+() to capture part of the pattern
+
+mysite2/urls.py
+    url(r'', include('myblog2.urls'))
+        Homepage/Index for blog site
+    ^^^ --> With this, Django will redirect everything that comes to 
+            homepage to myblog2.urls (app url configs).
+
+myblog2/urls.py
+    from django.conf.urls import url
+    from . import views
+
+    urlpatterns = [
+        url(r'^$', views.post_list, name='post_list'),
+    ]
+
+As you can see, we're now assigning a view called post_list to ^$ URL. This regular expression will match ^ (a beginning) followed by $ (an end) - so only an empty string will match. That's correct, because in Django URL resolvers, 'http://127.0.0.1:8000/' is not a part of the URL. This pattern will tell Django that views.post_list is the right place to go if someone enters your website at the 'http://127.0.0.1:8000/' address.
+
+The last part name='post_list' is the name of the URL that will be used to identify the view. This can be the same as the name of the view but it can also be something completely different. We will be using the named URLs later in the project so it is important to name each URL in the app. We should also try to keep the names of URLs unique and easy to remember.
+
+=========================================================
+Django Views
+=========================================================
+View = "logic" of application
+    Requests information from the model(database object) and 
+    then passes that to template.
+
+myblog2/views.py
+    Simplest view could look like this:
+        def post_list(request):
+            return render(request, 'blog/post_list.html', {})
+
+As you can see, we created a function (def) called post_list that takes request and return a function render that will render (put together) our template blog/post_list.html.
+
+===========================================================
+HTML Templates
+===========================================================
+Django template's format is described in HTML
+
+Create HTML template in: myblog2/templates/myblog2/post_list.html
+for the view (which pulled data from model/database object).
+
+===========================================================
+Django Query Set
+===========================================================
+Query set is a list of objects of a given model(database) -->
+allows you to read data from database, filter it, and order it.
+
+Django interactive mode --> python manage.py shell
+
+>>> from blog.models import Post
+>>> Post.objects.all()
+[<Post: my post title>, <Post: another post title>]
+
+>>> User.objects.all()
+[<User: ola>]
+
+Create a Post using Query Set:
+>>> Post.objects.create(author=me, title='Sample title', text='Test')
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+http://tutorial.djangogirls.org/en/dynamic_data_in_templates/
 
 
 
